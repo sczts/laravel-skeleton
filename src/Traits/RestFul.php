@@ -24,7 +24,7 @@ trait RestFul
         $limit = $request->input('limit',10);
         $query = static::filter($this->getModel(), $request);
         $count = $query->count();
-        $data = $query->skip(($page-1)*$limit)->take($limit)->toSql();
+        $data = $query->skip(($page-1)*$limit)->take($limit)->get();
         return $this->json(StatusCode::SUCCESS, ['data' => $data,'count'=>$count]);
     }
 
@@ -77,7 +77,7 @@ trait RestFul
      */
     public function destroy($id)
     {
-        $status = $this->getModel()->destroy($id);
+        $status = $this->getModel()->where('id',$id)->delete();
         if ($status) {
             return $this->json(StatusCode::SUCCESS);
         }
