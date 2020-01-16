@@ -46,7 +46,7 @@ trait RestFul
      */
     public function store()
     {
-        $data = $this->validate($this->addRule());
+        $data = $this->validator($this->addRule());
         $status = $this->getModel()->create($data);
         if ($status) {
             return $this->json(StatusCode::SUCCESS);
@@ -62,7 +62,7 @@ trait RestFul
      */
     public function update($id)
     {
-        $data = $this->validate($this->editRule());
+        $data = $this->validator($this->editRule());
         $status = $this->getModel()->findOrFail($id)->update($data);
         if ($status) {
             return $this->json(StatusCode::SUCCESS);
