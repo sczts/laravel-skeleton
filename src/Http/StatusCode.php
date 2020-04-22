@@ -17,5 +17,5 @@ class StatusCode
     const AUTHENTICATION_s = ['code' => 0, 'msg' => 'token 已过期，请重新生成'];
     const INSUFFICIENT_BALANCE = ['code' => -1, 'msg' => '余额不足，请先充值'];
     const TOKEN_EXPIRATION = ['code' => -1,'msg'=> 'token 已过期，请重新申请'];
-    const DATA_NOT_FOUND = ['code' => -1,'msg'=> '数据未找到'];
+    const DATA_NOT_FOUND = ['code' => 404,'msg'=> '数据不存在或者已删除'];
 }
