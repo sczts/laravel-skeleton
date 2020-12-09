@@ -1,8 +1,8 @@
 <?php
 
+
 namespace Sczts\Skeleton\Exceptions;
 
-use Exception;
 
 class HttpException extends Exception
 {

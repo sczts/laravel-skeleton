@@ -1,15 +1,11 @@
 <?php
 
 
-namespace Sczts\Skeleton\Traits\Models;
+namespace Sczts\Skeleton\Traits\ORM;
 
 
 trait Cache
 {
-    public static function getAll()
-    {
-        
-    }
     
     
     /**

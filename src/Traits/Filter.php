@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Sczts\Skeleton\Traits\Models;
+namespace Sczts\Skeleton\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\QueryException;
@@ -9,28 +9,7 @@ use Illuminate\Http\Request;
 
 trait Filter
 {
-    /**
-     * @param Builder $query
-     * @param Request $request
-     * @return Builder
-     * @throws \Exception
-     */
-    public function scopeFilter(Builder $query, Request $request)
-    {
-        return static::filter($query, $request);
-    }
-
-    /**
-     * @param Builder $query
-     * @param $where
-     * @return Builder
-     */
-    public function scopeMultiplesWhere(Builder $query, $where)
-    {
-        return static::multiplesWhere($query, $where);
-    }
-
-    protected static function json2arr($value)
+    protected function json2arr($value)
     {
         if (is_array($value)) {
             return $value;
@@ -39,28 +18,28 @@ trait Filter
     }
 
     /**
+     * 列表数据筛选
      * @param Builder $query
      * @param Request $request
      * @return Builder
      */
-    public static function filter(Builder $query, Request $request)
+    public function filter(Builder $query, Request $request)
     {
         try {
             if ($request->has('where')) {
-                $where = static::json2arr($request->input('where', []));
-                $query = static::multiplesWhere($query, $where);
+                $query = $this->multiplesWhere($query, $request->input('where'));
             }
 
             if ($request->has('search') && !empty($request->input('search'))) {
-                $search = static::json2arr($request->input('search'));
+                $search = $this->json2arr($request->input('search'));
                 if (!empty($search['field'])) {
-                    $query->where($search['field'], 'like', '%' . $search['value'] . '%');
+                    $query = $query->where($search['field'], 'like', '%' . $search['value'] . '%');
                 }
             }
 
             if ($request->has('orderBy')) {
                 $order = explode(',', $request->input('orderBy', 'id,asc'));
-                $query->orderBy(...$order);
+                $query = $query->orderBy(...$order);
             }
         } catch (QueryException  $exception) {
             throw $exception;
@@ -69,13 +48,14 @@ trait Filter
     }
 
     /**
+     * 多条件筛选
      * @param Builder $query
      * @param $where
      * @return Builder
      */
-    public static function multiplesWhere(Builder $query, $where)
+    public function multiplesWhere(Builder $query, $where)
     {
-        $where = static::json2arr($where);
+        $where = $this->json2arr($where);
         foreach ($where as $k => $v) {
             if (is_array($v)) {
                 $query = $query->whereIn($k, $v);
