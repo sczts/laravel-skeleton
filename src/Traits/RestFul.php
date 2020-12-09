@@ -4,14 +4,12 @@ namespace Sczts\Skeleton\Traits;
 
 
 use Illuminate\Database\Eloquent\Builder;
-use Sczts\Skeleton\Http\StatusCode;
-use Sczts\Skeleton\Traits\Models\Filter;
 use Illuminate\Http\Request;
 
 
 trait RestFul
 {
-    use Filter;
+    use Filter, JsonResponse;
 
     /**
      * 获取列表
@@ -20,68 +18,68 @@ trait RestFul
      */
     public function list(Request $request)
     {
-        $page = $request->input('page',1);
-        $limit = $request->input('limit',10);
-        $query = static::filter($this->getModel(), $request);
+        $page = $request->input('page', 1);
+        $limit = $request->input('limit', 10);
+        $query = $this->filter($this->getModel(), $request);
         $count = $query->count();
-        $data = $query->skip(($page-1)*$limit)->take($limit)->get();
-        return $this->json(StatusCode::SUCCESS, ['data' => $data,'count'=>$count]);
+        $data = $query->skip(($page - 1) * $limit)->take($limit)->get();
+        return $this->withCount($data, $count);
     }
 
     /**
-     * 获取
-     * @param int $id 资源Id
-     * @return mixed
+     * 获取资源
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show($id)
     {
         $data = $this->getModel()->findOrFail($id);
-        return $this->json(StatusCode::SUCCESS, ['data' => $data]);
+        return $this->success($data);
     }
 
     /**
      * 创建资源
-     * @return mixed
-     * @throws \App\Exceptions\FromValidator
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function store()
+    public function store(Request $request)
     {
-        $data = $this->validator($this->addRule());
+        $data = $request->validate($this->addRule());
         $status = $this->getModel()->create($data);
         if ($status) {
-            return $this->json(StatusCode::SUCCESS);
+            return $this->success();
         }
-        return $this->json(StatusCode::ERROR);
+        return $this->failed();
     }
 
     /**
-     * 修改
-     * @param int $id 资源Id
-     * @return mixed
-     * @throws \App\Exceptions\FromValidator
+     * 修改资源
+     * @param $id
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function update($id)
+    public function update($id, Request $request)
     {
-        $data = $this->validator($this->editRule());
+        $data = $request->validate($this->editRule());
         $status = $this->getModel()->findOrFail($id)->update($data);
         if ($status) {
-            return $this->json(StatusCode::SUCCESS);
+            return $this->success();
         }
-        return $this->json(StatusCode::ERROR);
+        return $this->failed();
     }
 
     /**
-     * 删除
+     * 删除资源
      * @param $id
-     * @return mixed
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy($id)
     {
-        $status = $this->getModel()->where('id',$id)->delete();
+        $status = $this->getModel()->where('id', $id)->delete();
         if ($status) {
-            return $this->json(StatusCode::SUCCESS);
+            return $this->success();
         }
-        return $this->json(StatusCode::ERROR);
+        return $this->failed();
     }
 
     protected abstract function getModel(): Builder;
@@ -89,4 +87,6 @@ trait RestFul
     protected abstract function addRule(): array;
 
     protected abstract function editRule(): array;
+
+
 }
