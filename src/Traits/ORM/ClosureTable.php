@@ -7,11 +7,15 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Trait ClosureTable
+ * @method Builder query()
+ * @package Sczts\Skeleton\Traits\ORM
+ */
 trait ClosureTable
 {
     use MakeTree;
 
-    abstract public static function query(): Builder;
     // 关联表名称
     abstract public static function tableName();
 
