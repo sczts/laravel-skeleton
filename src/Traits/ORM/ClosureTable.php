@@ -9,8 +9,9 @@ use Illuminate\Support\Facades\DB;
 
 trait ClosureTable
 {
-    use HasChildren;
+    use MakeTree;
 
+    abstract public static function query(): Builder;
     // 关联表名称
     abstract public static function tableName();
 
@@ -128,6 +129,29 @@ trait ClosureTable
             AND subtbl.{$root_column} = {$node_id}
         ";
         DB::statement($move);
+    }
+
+    /**
+     * 获取直接子集节点
+     * @param $id
+     * @return Collection
+     */
+    public static function children($id)
+    {
+        return static::descendants($id,1);
+    }
+
+    /**
+     * 获取父级节点
+     * @param $id
+     * @return Builder|\Illuminate\Database\Eloquent\Model|object|null
+     */
+    public static function parent($id)
+    {
+        return static::query()->where([
+            static::getNodeColumn() => $id,
+            static::getDepthColumn() => 1
+        ])->first();
     }
 
     /**
